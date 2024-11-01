@@ -1,7 +1,6 @@
 # compiled output
 .env
 /node_modules
-postgres/
 # Logs
 logs
 *.log
