@@ -61,7 +61,7 @@ export class ProductsService {
     .createQueryBuilder(Salesdetail, 'salesdetail')
     .leftJoinAndSelect('salesdetail.productId', 'product')
     .leftJoinAndSelect('salesdetail.saleId', 'sale')
-    .where('sale.createdAt BETWEEN :startOfCurrentMonth AND :endOfCurrentMonth', { startOfCurrentMonth, endOfCurrentMonth })
+    .where('DATE(sale.createdAt) BETWEEN :startOfCurrentMonth AND :endOfCurrentMonth', { startOfCurrentMonth, endOfCurrentMonth })
     .select('salesdetail.productId')
     .addSelect('product.name', 'product_name') 
     .addSelect('product.url', 'url') 
