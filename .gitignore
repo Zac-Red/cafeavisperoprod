@@ -1,8 +1,13 @@
 # compiled output
 .env
-/dist
 /node_modules
 postgres/
+docker-compose.yaml
+nest-cli.json
+tsconfig.build.json
+tsconfig.json
+/src
+
 # Logs
 logs
 *.log

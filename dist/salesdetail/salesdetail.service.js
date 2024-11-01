@@ -1,0 +1,69 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SalesdetailService = void 0;
+const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const salesdetail_entity_1 = require("./entities/salesdetail.entity");
+const typeorm_2 = require("typeorm");
+const adapters_1 = require("../common/adapters");
+const create_helper_1 = require("../common/helpers/create.helper");
+const sales_service_1 = require("../sales/sales.service");
+let SalesdetailService = class SalesdetailService {
+    constructor(salesdetailRepository, saleservice, DBErrors, uuidAdapter) {
+        this.salesdetailRepository = salesdetailRepository;
+        this.saleservice = saleservice;
+        this.DBErrors = DBErrors;
+        this.uuidAdapter = uuidAdapter;
+    }
+    async create(createSalesdetailDto, manager) {
+        try {
+            return await (0, create_helper_1.createRegisterForTransaction)({ ...createSalesdetailDto }, manager, salesdetail_entity_1.Salesdetail);
+        }
+        catch (error) {
+            this.DBErrors.exceptionsDB(error);
+        }
+    }
+    async findOne(id) {
+        let salesdetails;
+        let sale;
+        if (this.uuidAdapter.IsUUID(id)) {
+            sale = await this.saleservice.findOne(id);
+            const queryBuilder = this.salesdetailRepository.createQueryBuilder('salesdetail')
+                .leftJoinAndSelect("salesdetail.productId", "product")
+                .leftJoinAndSelect("product.unitmeasureId", "unitmeasure");
+            salesdetails = await queryBuilder.where("salesdetail.saleId =:saleId", { saleId: id }).getMany();
+        }
+        if (!salesdetails)
+            throw new common_1.BadRequestException(`No existe detalles con el ID de venta  ${id}`);
+        return { sale, salesdetails };
+    }
+    update(id, updateSalesdetailDto) {
+        return `This action updates a #${id} salesdetail`;
+    }
+    remove(id) {
+        return `This action removes a #${id} salesdetail`;
+    }
+};
+exports.SalesdetailService = SalesdetailService;
+exports.SalesdetailService = SalesdetailService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(salesdetail_entity_1.Salesdetail)),
+    __param(1, (0, common_1.Inject)((0, common_1.forwardRef)(() => sales_service_1.SalesService))),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        sales_service_1.SalesService,
+        adapters_1.HandleDBErrors,
+        adapters_1.UuidAdapter])
+], SalesdetailService);
+//# sourceMappingURL=salesdetail.service.js.map
